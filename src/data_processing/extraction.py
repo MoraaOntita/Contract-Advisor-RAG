@@ -1,6 +1,8 @@
 from docx import Document
 import re
 import os
+import argparse
+import json
 
 def extract_text_with_metadata(docx_path):
     try:
@@ -31,3 +33,17 @@ def extract_text_with_metadata(docx_path):
     except Exception as e:
         print(f"Error reading {docx_path}: {e}")
         return []
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--docx', required=True, help='Path to the DOCX file')
+    parser.add_argument('--output', required=True, help='Path to the output JSON file')
+    args = parser.parse_args()
+
+    documents = extract_text_with_metadata(args.docx)
+    with open(args.output, 'w') as f:
+        json.dump(documents, f, indent=2)
+    print(f"Extracted data saved to {args.output}")
+
+if __name__ == '__main__':
+    main()

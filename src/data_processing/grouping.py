@@ -1,4 +1,6 @@
-
+import argparse
+import json
+import os
 
 def group_paragraphs_into_sections(documents):
     sections = []
@@ -19,3 +21,20 @@ def group_paragraphs_into_sections(documents):
         sections.append(current_section)
 
     return sections
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True, help='Path to the input JSON file')
+    parser.add_argument('--output', required=True, help='Path to the output JSON file')
+    args = parser.parse_args()
+
+    with open(args.input, 'r') as f:
+        documents = json.load(f)
+
+    sections = group_paragraphs_into_sections(documents)
+    with open(args.output, 'w') as f:
+        json.dump(sections, f, indent=2)
+    print(f"Grouped sections saved to {args.output}")
+
+if __name__ == '__main__':
+    main()

@@ -1,10 +1,10 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import argparse
+import json
 import os
 import sys
 
-# Add the src directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
-
 from src.config import CHUNK_SIZE, CHUNK_OVERLAP
 
 def chunk_sections(sections):
@@ -37,3 +37,20 @@ def chunk_sections(sections):
             print(f"Error processing section with title '{section['metadata'].get('section_title', 'Unknown')}' - {e}")
 
     return chunks
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--input', required=True, help='Path to the input JSON file')
+    parser.add_argument('--output', required=True, help='Path to the output JSON file')
+    args = parser.parse_args()
+
+    with open(args.input, 'r') as f:
+        sections = json.load(f)
+
+    chunks = chunk_sections(sections)
+    with open(args.output, 'w') as f:
+        json.dump(chunks, f, indent=2)
+    print(f"Chunks saved to {args.output}")
+
+if __name__ == '__main__':
+    main()
