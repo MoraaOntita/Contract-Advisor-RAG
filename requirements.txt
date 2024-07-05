@@ -1,0 +1,11 @@
+langchain 
+openai 
+python-docx
+python-dotenv
+tiktoken
+pinecone-client
+langchain_openai
+langchain_community
+rank_bm25
+sentence-transformers
+
