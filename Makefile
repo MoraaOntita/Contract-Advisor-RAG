@@ -10,9 +10,10 @@ ARTIFACTS_DIR = artifacts
 EMBEDDINGS_FILE = $(ARTIFACTS_DIR)/embeddings.json
 CHUNKS_FILE = $(ARTIFACTS_DIR)/chunks.json
 PINECONE_INDEX_NAME = wk11-embeddings  # Use the index name from config.py
+MAIN_SCRIPT = src/api/main.py  # Update this line for the FastAPI server
 
 # Default target to run all scripts
-all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings run_rag_pipeline
+all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings run_rag_pipeline run_server
 
 # Create artifacts directory if it doesn't exist
 create_artifacts_dir:
@@ -48,6 +49,11 @@ run_rag_pipeline:
 	@echo "Running RAG pipeline..."
 	PYTHONPATH=src python $(RAG_PIPELINE_SCRIPT)
 
+# Run FastAPI server
+run_server:
+	@echo "Running FastAPI server..."
+	PYTHONPATH=src uvicorn api.main:app --reload  # Updated to use src/api/main.py as the entry point
+
 # Clean up generated files
 clean:
 	@echo "Cleaning up..."
@@ -64,5 +70,6 @@ help:
 	@echo "  make generate_embeddings - Generate embeddings from chunks"
 	@echo "  make upload_embeddings - Upload embeddings to Pinecone"
 	@echo "  make run_rag_pipeline - Run the RAG pipeline script"
+	@echo "  make run_server      - Run the FastAPI server"
 	@echo "  make clean           - Clean up generated files"
 	@echo "  make help            - Display this help message"

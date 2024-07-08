@@ -8,4 +8,6 @@ langchain_openai
 langchain_community
 rank_bm25
 sentence-transformers
+fastapi
+uvicorn
 
