@@ -52,7 +52,7 @@ run_rag_pipeline:
 # Run FastAPI server
 run_server:
 	@echo "Running FastAPI server..."
-	PYTHONPATH=src uvicorn api.main:app --reload  # Updated to use src/api/main.py as the entry point
+	PYTHONPATH=src uvicorn api.main:app --reload 
 
 # Clean up generated files
 clean:
