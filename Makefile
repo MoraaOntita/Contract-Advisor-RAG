@@ -5,13 +5,15 @@ GROUPING_SCRIPT = src/data_processing/grouping.py
 CHUNKING_SCRIPT = src/data_processing/chunking.py
 GENERATE_EMBEDDINGS_SCRIPT = src/embeddings/generate.py
 PINECONE_MANAGER_SCRIPT = src/embeddings/pinecone_manager.py
+RETRIEVE_SCRIPT = src/retrieval/retrieve.py
+GENERATE_RESPONSE_SCRIPT = src/response_generation/generate_response.py
 ARTIFACTS_DIR = artifacts
 EMBEDDINGS_FILE = $(ARTIFACTS_DIR)/embeddings.json
 CHUNKS_FILE = $(ARTIFACTS_DIR)/chunks.json
 PINECONE_INDEX_NAME = wk11-embeddings  # Use the index name from config.py
 
 # Default target to run all scripts
-all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings
+all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings retrieve generate_response
 
 # Create artifacts directory if it doesn't exist
 create_artifacts_dir:
@@ -42,6 +44,16 @@ upload_embeddings:
 	@echo "Uploading embeddings to Pinecone..."
 	PYTHONPATH=src python $(PINECONE_MANAGER_SCRIPT) --index_name $(PINECONE_INDEX_NAME) --embeddings_file $(EMBEDDINGS_FILE)
 
+# Retrieve relevant context
+retrieve:
+	@echo "Running retrieval script..."
+	PYTHONPATH=src python $(RETRIEVE_SCRIPT)
+
+# Generate response
+generate_response:
+	@echo "Running response generation script..."
+	PYTHONPATH=src python $(GENERATE_RESPONSE_SCRIPT)
+
 # Clean up generated files
 clean:
 	@echo "Cleaning up..."
@@ -57,5 +69,7 @@ help:
 	@echo "  make chunk           - Chunk sections into manageable pieces"
 	@echo "  make generate_embeddings - Generate embeddings from chunks"
 	@echo "  make upload_embeddings - Upload embeddings to Pinecone"
+	@echo "  make retrieve        - Run the retrieval script"
+	@echo "  make generate_response - Run the response generation script"
 	@echo "  make clean           - Clean up generated files"
 	@echo "  make help            - Display this help message"
