@@ -9,8 +9,11 @@ RAG_PIPELINE_SCRIPT = src/rag_pipeline.py
 ARTIFACTS_DIR = artifacts
 EMBEDDINGS_FILE = $(ARTIFACTS_DIR)/embeddings.json
 CHUNKS_FILE = $(ARTIFACTS_DIR)/chunks.json
-PINECONE_INDEX_NAME = wk11-embeddings  # Use the index name from config.py
-MAIN_SCRIPT = src/api/main.py  # Update this line for the FastAPI server
+PINECONE_INDEX_NAME = wk11-embeddings
+MAIN_SCRIPT = src/api/main.py
+
+# Define Docker container name
+CONTAINER_NAME = api_container
 
 # Default target to run all scripts
 all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings run_rag_pipeline run_server
@@ -22,37 +25,37 @@ create_artifacts_dir:
 # Extract text and metadata from DOCX
 extract:
 	@echo "Running extraction script..."
-	PYTHONPATH=src python $(EXTRACTION_SCRIPT) --docx $(DATA_DOCX) --output $(ARTIFACTS_DIR)/output.json
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(EXTRACTION_SCRIPT) --docx $(DATA_DOCX) --output $(ARTIFACTS_DIR)/output.json
 
 # Group paragraphs into sections
 group:
 	@echo "Running grouping script..."
-	PYTHONPATH=src python $(GROUPING_SCRIPT) --input $(ARTIFACTS_DIR)/output.json --output $(ARTIFACTS_DIR)/sections.json
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(GROUPING_SCRIPT) --input $(ARTIFACTS_DIR)/output.json --output $(ARTIFACTS_DIR)/sections.json
 
 # Chunk sections into manageable pieces
 chunk:
 	@echo "Running chunking script..."
-	PYTHONPATH=src python $(CHUNKING_SCRIPT) --input $(ARTIFACTS_DIR)/sections.json --output $(CHUNKS_FILE)
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(CHUNKING_SCRIPT) --input $(ARTIFACTS_DIR)/sections.json --output $(CHUNKS_FILE)
 
 # Generate embeddings
 generate_embeddings:
 	@echo "Generating embeddings..."
-	PYTHONPATH=src python $(GENERATE_EMBEDDINGS_SCRIPT) --chunks_file $(CHUNKS_FILE) --embeddings_file $(EMBEDDINGS_FILE)
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(GENERATE_EMBEDDINGS_SCRIPT) --chunks_file $(CHUNKS_FILE) --embeddings_file $(EMBEDDINGS_FILE)
 
 # Upload embeddings to Pinecone
 upload_embeddings:
 	@echo "Uploading embeddings to Pinecone..."
-	PYTHONPATH=src python $(PINECONE_MANAGER_SCRIPT) --index_name $(PINECONE_INDEX_NAME) --embeddings_file $(EMBEDDINGS_FILE)
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(PINECONE_MANAGER_SCRIPT) --index_name $(PINECONE_INDEX_NAME) --embeddings_file $(EMBEDDINGS_FILE)
 
 # Run RAG pipeline
 run_rag_pipeline:
 	@echo "Running RAG pipeline..."
-	PYTHONPATH=src python $(RAG_PIPELINE_SCRIPT)
+	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(RAG_PIPELINE_SCRIPT)
 
 # Run FastAPI server
 run_server:
 	@echo "Running FastAPI server..."
-	PYTHONPATH=src uvicorn api.main:app --reload 
+	docker exec -it $(CONTAINER_NAME) uvicorn api.main:app --reload
 
 # Clean up generated files
 clean:
