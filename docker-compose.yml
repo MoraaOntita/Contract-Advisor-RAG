@@ -21,7 +21,7 @@ services:
 
   fastapi_app:
     build: .
-    container_name: api_container  # Ensuring the container name matches Makefile
+    container_name: api_container
     depends_on:
       - postgres
       - redis
@@ -30,8 +30,52 @@ services:
     env_file:
       - .env
     volumes:
-      - .:/app  # Ensure your application code is mounted correctly
+      - .:/app
     command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --reload
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - fastapi_app
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+
+  pyspy:
+    build:
+      context: ./profiling/py-spy
+    container_name: pyspy
+    pid: "host"
+    depends_on:
+      - fastapi_app
+    volumes:
+      - /tmp:/tmp
+    entrypoint: >
+      /bin/sh -c "while true; do sleep 30; done"
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8081:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - fastapi_app
 
 volumes:
   postgres_data:

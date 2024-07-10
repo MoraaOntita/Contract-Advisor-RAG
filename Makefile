@@ -1,78 +1,56 @@
-# Define paths
-DATA_DOCX = data/train/Raptor_Contract.docx
-EXTRACTION_SCRIPT = src/data_processing/extraction.py
-GROUPING_SCRIPT = src/data_processing/grouping.py
-CHUNKING_SCRIPT = src/data_processing/chunking.py
-GENERATE_EMBEDDINGS_SCRIPT = src/embeddings/generate.py
-PINECONE_MANAGER_SCRIPT = src/embeddings/pinecone_manager.py
-RAG_PIPELINE_SCRIPT = src/rag_pipeline.py
-ARTIFACTS_DIR = artifacts
-EMBEDDINGS_FILE = $(ARTIFACTS_DIR)/embeddings.json
-CHUNKS_FILE = $(ARTIFACTS_DIR)/chunks.json
-PINECONE_INDEX_NAME = wk11-embeddings
-MAIN_SCRIPT = src/api/main.py
+# Define the default shell
+SHELL := /bin/bash
 
-# Define Docker container name
-CONTAINER_NAME = api_container
+# Constants
+DOCKER_CONTAINER := api_container
 
-# Default target to run all scripts
-all: create_artifacts_dir extract group chunk generate_embeddings upload_embeddings run_rag_pipeline run_server
+# Directories
+SRC_DIR := src
+DATA_DIR := data/train
+OUTPUT_DIR := artifacts
 
-# Create artifacts directory if it doesn't exist
-create_artifacts_dir:
-	@mkdir -p $(ARTIFACTS_DIR)
+# Scripts
+EXTRACTION_SCRIPT := $(SRC_DIR)/data_processing/extraction.py
+GROUPING_SCRIPT := $(SRC_DIR)/data_processing/grouping.py
+CHUNKING_SCRIPT := $(SRC_DIR)/data_processing/chunking.py
+EMBEDDING_SCRIPT := $(SRC_DIR)/embeddings/generate.py
+RETRIEVAL_SCRIPT := $(SRC_DIR)/retrieval/retrieve.py
+RESPONSE_SCRIPT := $(SRC_DIR)/response_generation/generate_response.py
 
-# Extract text and metadata from DOCX
+# Files
+DOCX_FILE := $(DATA_DIR)/Raptor_Contract.docx
+OUTPUT_FILE := $(OUTPUT_DIR)/output.json
+GROUPED_OUTPUT := $(OUTPUT_DIR)/grouped_output.json
+CHUNKED_OUTPUT := $(OUTPUT_DIR)/chunked_output.json
+EMBEDDINGS_OUTPUT := $(OUTPUT_DIR)/embeddings_output.json
+RETRIEVED_OUTPUT := $(OUTPUT_DIR)/retrieved_output.json
+FINAL_RESPONSE := $(OUTPUT_DIR)/final_response.json
+
+# Targets
+.PHONY: all extract group chunk embed retrieve generate_response
+
+all: extract group chunk embed retrieve generate_response
+
 extract:
 	@echo "Running extraction script..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(EXTRACTION_SCRIPT) --docx $(DATA_DOCX) --output $(ARTIFACTS_DIR)/output.json
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(EXTRACTION_SCRIPT) --docx $(DOCX_FILE) --output $(OUTPUT_FILE)"
 
-# Group paragraphs into sections
 group:
 	@echo "Running grouping script..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(GROUPING_SCRIPT) --input $(ARTIFACTS_DIR)/output.json --output $(ARTIFACTS_DIR)/sections.json
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(GROUPING_SCRIPT) --input $(OUTPUT_FILE) --output $(GROUPED_OUTPUT)"
 
-# Chunk sections into manageable pieces
 chunk:
 	@echo "Running chunking script..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(CHUNKING_SCRIPT) --input $(ARTIFACTS_DIR)/sections.json --output $(CHUNKS_FILE)
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(CHUNKING_SCRIPT) --input $(GROUPED_OUTPUT) --output $(CHUNKED_OUTPUT)"
 
-# Generate embeddings
-generate_embeddings:
-	@echo "Generating embeddings..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(GENERATE_EMBEDDINGS_SCRIPT) --chunks_file $(CHUNKS_FILE) --embeddings_file $(EMBEDDINGS_FILE)
+embed:
+	@echo "Running embedding script..."
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(EMBEDDING_SCRIPT) --input $(CHUNKED_OUTPUT) --output $(EMBEDDINGS_OUTPUT)"
 
-# Upload embeddings to Pinecone
-upload_embeddings:
-	@echo "Uploading embeddings to Pinecone..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(PINECONE_MANAGER_SCRIPT) --index_name $(PINECONE_INDEX_NAME) --embeddings_file $(EMBEDDINGS_FILE)
+retrieve:
+	@echo "Running retrieval script..."
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(RETRIEVAL_SCRIPT) --input $(EMBEDDINGS_OUTPUT) --output $(RETRIEVED_OUTPUT)"
 
-# Run RAG pipeline
-run_rag_pipeline:
-	@echo "Running RAG pipeline..."
-	docker exec -it $(CONTAINER_NAME) PYTHONPATH=src python $(RAG_PIPELINE_SCRIPT)
-
-# Run FastAPI server
-run_server:
-	@echo "Running FastAPI server..."
-	docker exec -it $(CONTAINER_NAME) uvicorn api.main:app --reload
-
-# Clean up generated files
-clean:
-	@echo "Cleaning up..."
-	rm -rf $(ARTIFACTS_DIR)
-
-# Help target to display available commands
-help:
-	@echo "Makefile for running data processing and embedding scripts"
-	@echo "Usage:"
-	@echo "  make all             - Run all scripts in sequence"
-	@echo "  make extract         - Extract text and metadata from DOCX"
-	@echo "  make group           - Group paragraphs into sections"
-	@echo "  make chunk           - Chunk sections into manageable pieces"
-	@echo "  make generate_embeddings - Generate embeddings from chunks"
-	@echo "  make upload_embeddings - Upload embeddings to Pinecone"
-	@echo "  make run_rag_pipeline - Run the RAG pipeline script"
-	@echo "  make run_server      - Run the FastAPI server"
-	@echo "  make clean           - Clean up generated files"
-	@echo "  make help            - Display this help message"
+generate_response:
+	@echo "Running response generation script..."
+	docker exec -it $(DOCKER_CONTAINER) bash -c "PYTHONPATH=src python $(RESPONSE_SCRIPT) --input $(RETRIEVED_OUTPUT) --output $(FINAL_RESPONSE)"
