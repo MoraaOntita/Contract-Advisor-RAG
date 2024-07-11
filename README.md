@@ -10,7 +10,7 @@ This Chat App is a Python application that allows you to chat with contract docu
 
 The application follows these steps to provide responses to your questions:
 
-1. **PDF Loading**: The app reads multiple PDF documents and extracts their text content.
+1. **PDF Loading**: The app reads multiple docx documents and extracts their text content.
 2. **Text Chunking**: The extracted text is divided into smaller chunks that can be processed effectively.
 3. **Language Model**: The application utilizes a language model to generate vector representations (embeddings) of the text chunks.
 4. **Similarity Matching**: When you ask a question, the app compares it with the text chunks and identifies the most semantically similar ones.
