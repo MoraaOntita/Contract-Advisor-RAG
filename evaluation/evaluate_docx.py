@@ -7,6 +7,7 @@ from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
 import matplotlib.pyplot as plt
 from docx import Document
+import config
 
 # Add the src directory to the Python path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
@@ -76,16 +77,12 @@ def load_questions_answers(file_path):
     return questions, answers
 
 if __name__ == "__main__":
-    # Paths to the contract and question-and-answer documents
-    contract_path = '/home/moraa/Documents/10_academy/week-11/data/evaluate/Robinson Advisory.docx'
-    qa_path = '/home/moraa/Documents/10_academy/week-11/data/evaluate/Robinson Q&A.docx'
-
     # Load contract
-    contract_text = load_docx(contract_path)
+    contract_text = load_docx(config.CONTRACT_PATH)
     print("Contract Loaded:\n", contract_text)
 
     # Load questions and answers
-    questions, answers = load_questions_answers(qa_path)
+    questions, answers = load_questions_answers(config.QA_PATH)
     print("Questions and Answers Loaded:\n", questions, answers)
 
     # Initialize the RAG system
