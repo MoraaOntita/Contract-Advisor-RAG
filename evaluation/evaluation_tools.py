@@ -1,9 +1,16 @@
+import sys
+import os
 import time
 from sklearn.metrics import precision_score, recall_score, f1_score
 from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
 import matplotlib.pyplot as plt
 import json
+
+# Add the src directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+from rag_pipeline import RAGSystem  # Ensure this matches your actual module structure
 
 class EvaluationTools:
     def __init__(self, rag_system):
@@ -54,8 +61,6 @@ class EvaluationTools:
 
 # Example usage
 if __name__ == "__main__":
-    from rag_pipeline import RAGSystem  # Ensure this matches your actual module structure
-    
     # Define test queries and expected responses
     test_queries = [
         "What is the contract duration?",
