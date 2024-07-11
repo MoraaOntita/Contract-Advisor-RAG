@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.10'
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
@@ -31,6 +31,12 @@ jobs:
       run: |
         echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> .env
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+
+    - name: Download fine-tuned model
+      run: |
+        mkdir -p /home/moraa/Documents/10_academy/week-11/model
+        wget -O /home/moraa/Documents/10_academy/week-11/model/fine-tuned-model.zip "YOUR_MODEL_FILE_URL"
+        unzip /home/moraa/Documents/10_academy/week-11/model/fine-tuned-model.zip -d /home/moraa/Documents/10_academy/week-11/model
 
     - name: Run evaluation script
       run: |
