@@ -17,3 +17,8 @@ redis
 prometheus-client
 prometheus_fastapi_instrumentator
 py-spy
+scikit-learn
+nltk
+rouge-score
+matplotlib
+
