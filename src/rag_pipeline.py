@@ -4,13 +4,14 @@ from sentence_transformers import SentenceTransformer
 from pinecone import Pinecone as PineconeClient
 from langchain_community.chat_models import ChatOpenAI
 from langchain.schema import Document as LangchainDocument, HumanMessage
+import config  
 
 # Load environment variables
 load_dotenv()
 
-# Load the fine-tuned model from the local path
-model_save_path = 'model/fine-tuned-model'
-model = SentenceTransformer(model_save_path)
+# Load the fine-tuned model from the specified path
+model_path = config.MODEL_PATH
+model = SentenceTransformer(model_path)
 
 # Initialize Pinecone API key
 pinecone_api_key = os.getenv('PINECONE_API_KEY')
@@ -74,6 +75,7 @@ def generate_response(user_prompt, relevant_contexts):
     except Exception as e:
         print(f"Error generating response: {e}")
         return "An error occurred while generating the response."
+
 
 class RAGSystem:
     def __init__(self):
