@@ -35,7 +35,7 @@ jobs:
     - name: Run evaluation script
       run: |
         . venv/bin/activate
-        python evaluation/evaluate_rag_system.py
+        python evaluation/evaluation_tools.py
 
     - name: Upload evaluation results
       uses: actions/upload-artifact@v2
