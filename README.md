@@ -4,7 +4,7 @@
 
 Build, Evaluate, and Improve the RAG system for Contract Q&A (chatting with a contract and asking questions about the contract).
 
-This Chat App is a Python application that allows you to chat with contract documents. You can ask questions about the contracts, and the application will provide relevant responses based on the content of the contracts you provide. This app utilizes a language model to generate accurate answers to your queries. Please note that the app will only respond to questions related to the loaded PDFs.
+This Chat App is a Python application that allows you to chat with contract documents. You can ask questions about the contracts, and the application will provide relevant responses based on the content of the contracts you provide. This app utilizes a language model to generate accurate answers to your queries. Please note that the app will only respond to questions related to the loaded docx.
 
 ## How It Works
 
