@@ -1,10 +1,16 @@
 import time
+import sys
+import os
 from sklearn.metrics import precision_score, recall_score, f1_score
 from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
 import matplotlib.pyplot as plt
 import json
-from src.rag_pipeline import RAGSystem  # Adjust the import based on your actual module structure
+
+# Add the src directory to the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'src')))
+
+from rag_pipeline import RAGSystem  # Ensure this matches your actual module structure
 
 # Define test queries and expected responses
 test_queries = [
@@ -50,12 +56,6 @@ def evaluate_rag_system(rag_system, test_queries, expected_responses):
         "rouge1_score": rouge1_avg,
         "rougeL_score": rougeL_avg
     }
-
-# Example RAG system query function
-class RAGSystem:
-    def query(self, query):
-        # Placeholder for actual RAG system query logic
-        return "Generated response for: " + query
 
 # Initialize the RAG system
 rag_system = RAGSystem()

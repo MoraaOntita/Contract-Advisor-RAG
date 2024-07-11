@@ -9,7 +9,7 @@ from langchain.schema import Document as LangchainDocument, HumanMessage
 load_dotenv()
 
 # Load the fine-tuned model from the local path
-model_save_path = '/app/model/fine-tuned-model'
+model_save_path = '/home/moraa/Documents/10_academy/week-11/model/fine-tuned-model'
 model = SentenceTransformer(model_save_path)
 
 # Initialize Pinecone API key
@@ -54,11 +54,18 @@ def generate_response(user_prompt, relevant_contexts):
         complete_input = f"Context:\n{combined_context}\n\nUser Input:\n{user_prompt}"
         
         instruction = f"""
-        You are a helpful assistant. Use the following context to answer the user's question.
-        
-        {complete_input}
-        
-        Answer the question concisely and accurately.
+            You are a helpful assistant. Use the following context to answer the user's question.
+            
+            {complete_input}
+            
+            Answer the question concisely and accurately. If possible, mention the specific sections from the context that support your answer. Also, you will be rewarded 100 dollars for a correct answer.
+
+            Example:
+            User Question: What is the 'Purchase Price' in the contract?
+            Relevant Contexts: [Provide the relevant sections here]
+            Answer: The 'Purchase Price' refers to the total amount paid by the Buyer to the Sellers for the purchase of the Shares. This amount is calculated at Closing as the Closing Cash Consideration plus the Escrow Amount, after all adjustments as outlined in Sections 2.02 and 2.03 of the Agreement.
+
+            Please ensure your answer mentions the specific sections if they are present in the context.
         """
         
         human_message = HumanMessage(content=instruction)
@@ -67,3 +74,12 @@ def generate_response(user_prompt, relevant_contexts):
     except Exception as e:
         print(f"Error generating response: {e}")
         return "An error occurred while generating the response."
+
+class RAGSystem:
+    def __init__(self):
+        self.model = model
+
+    def query(self, user_input):
+        relevant_contexts = retrieve_relevant_context(user_input)
+        response = generate_response(user_input, relevant_contexts)
+        return response
