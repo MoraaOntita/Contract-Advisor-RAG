@@ -30,3 +30,9 @@ jobs:
       run: |
         source venv/bin/activate
         python evaluation/evaluate_rag_system.py
+
+    - name: Upload results
+      uses: actions/upload-artifact@v2
+      with:
+        name: evaluation-results
+        path: evaluation/results.json

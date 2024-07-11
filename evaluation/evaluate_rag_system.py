@@ -3,10 +3,19 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 from nltk.translate.bleu_score import sentence_bleu
 from rouge_score import rouge_scorer
 import matplotlib.pyplot as plt
+import json
+from src.rag_pipeline import RAGSystem  # Adjust the import based on your actual module structure
 
 # Define test queries and expected responses
-test_queries = ["What is the contract duration?", "Who is the contractor?"]
-expected_responses = ["The contract duration is 2 years.", "The contractor is ABC Corp."]
+test_queries = [
+    "What is the contract duration?",
+    "Who is the contractor?"
+]
+
+expected_responses = [
+    "The contract duration is 2 years.",
+    "The contractor is ABC Corp."
+]
 
 # Function to evaluate the RAG system
 def evaluate_rag_system(rag_system, test_queries, expected_responses):
@@ -18,16 +27,16 @@ def evaluate_rag_system(rag_system, test_queries, expected_responses):
     accuracy = sum([gen == exp for gen, exp in zip(generated_responses, expected_responses)]) / len(test_queries)
 
     # Precision, Recall, F1 Score
-    precision = precision_score(expected_responses, generated_responses, average='micro')
-    recall = recall_score(expected_responses, generated_responses, average='micro')
-    f1 = f1_score(expected_responses, generated_responses, average='micro')
+    precision = precision_score(expected_responses, generated_responses, average='micro', zero_division=0)
+    recall = recall_score(expected_responses, generated_responses, average='micro', zero_division=0)
+    f1 = f1_score(expected_responses, generated_responses, average='micro', zero_division=0)
 
     # BLEU and ROUGE
     bleu_scores = [sentence_bleu([exp], gen) for gen, exp in zip(generated_responses, expected_responses)]
     bleu_score_avg = sum(bleu_scores) / len(bleu_scores)
     
-    rouge_scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
-    rouge_scores = [rouge_scorer.score(exp, gen) for gen, exp in zip(generated_responses, expected_responses)]
+    scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
+    rouge_scores = [scorer.score(exp, gen) for gen, exp in zip(generated_responses, expected_responses)]
     rouge1_avg = sum([score['rouge1'].fmeasure for score in rouge_scores]) / len(rouge_scores)
     rougeL_avg = sum([score['rougeL'].fmeasure for score in rouge_scores]) / len(rouge_scores)
 
@@ -58,7 +67,11 @@ metrics = evaluate_rag_system(rag_system, test_queries, expected_responses)
 for metric, value in metrics.items():
     print(f"{metric}: {value}")
 
-# Example of plotting results
+# Save results to a JSON file
+with open('evaluation/results.json', 'w') as f:
+    json.dump(metrics, f)
+
+# Plot results
 plt.figure(figsize=(10, 5))
 plt.bar(metrics.keys(), metrics.values())
 plt.title("RAG System Evaluation Metrics")
