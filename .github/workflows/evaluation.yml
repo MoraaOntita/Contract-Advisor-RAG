@@ -34,9 +34,9 @@ jobs:
 
     - name: Download fine-tuned model
       run: |
-        mkdir -p /home/moraa/Documents/10_academy/week-11/model
-        wget -O /home/moraa/Documents/10_academy/week-11/model/fine-tuned-model.zip "YOUR_MODEL_FILE_URL"
-        unzip /home/moraa/Documents/10_academy/week-11/model/fine-tuned-model.zip -d /home/moraa/Documents/10_academy/week-11/model
+        mkdir -p model
+        wget -O model/fine-tuned-model.zip "YOUR_MODEL_FILE_URL"
+        unzip model/fine-tuned-model.zip -d model
 
     - name: Run evaluation script
       run: |

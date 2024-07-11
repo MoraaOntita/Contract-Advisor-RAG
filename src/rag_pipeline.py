@@ -9,7 +9,7 @@ from langchain.schema import Document as LangchainDocument, HumanMessage
 load_dotenv()
 
 # Load the fine-tuned model from the local path
-model_save_path = '/home/moraa/Documents/10_academy/week-11/model/fine-tuned-model'
+model_save_path = 'model/fine-tuned-model'
 model = SentenceTransformer(model_save_path)
 
 # Initialize Pinecone API key
