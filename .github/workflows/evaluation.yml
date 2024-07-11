@@ -32,12 +32,6 @@ jobs:
         echo "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }}" >> .env
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
-    - name: Download fine-tuned model
-      run: |
-        mkdir -p model
-        wget -O model/fine-tuned-model.zip "YOUR_MODEL_FILE_URL"
-        unzip model/fine-tuned-model.zip -d model
-
     - name: Run evaluation script
       run: |
         . venv/bin/activate
