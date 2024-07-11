@@ -19,7 +19,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: '3.8'
 
     - name: Install dependencies
       run: |
@@ -33,6 +33,8 @@ jobs:
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
 
     - name: Run evaluation script
+      env:
+        PYTHONPATH: src  # Add the src directory to PYTHONPATH
       run: |
         . venv/bin/activate
         python evaluation/evaluation_tools.py
